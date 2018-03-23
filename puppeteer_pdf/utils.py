@@ -65,8 +65,10 @@ def puppeteer_to_pdf(input, output=None, **kwargs):
 
     input = file_path(input)
 
+    remove_output_file = False
     if not output:
         output = '/tmp/{0}.pdf'.format(uuid.uuid4())
+        remove_output_file = True
 
     # Default options:
     options = getattr(settings, 'PUPPETEER_PDF_CMD_OPTIONS', None)
@@ -91,7 +93,11 @@ def puppeteer_to_pdf(input, output=None, **kwargs):
 
     if os.path.isfile(output):
         with open(output, 'rb') as f:
-            return File(f).read()
+            data = File(f).read()
+
+        if remove_output_file:
+            os.unlink(output)
+        return data
     else:
         return None
 
